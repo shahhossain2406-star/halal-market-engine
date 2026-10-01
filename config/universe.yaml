@@ -1,0 +1,62 @@
+# ============================================================================
+# UNIVERSE  --  the companies/ETFs the engine tracks
+# ============================================================================
+# Edit this file freely. Add/remove tickers, fix names, change groups.
+# Ticker format = Yahoo Finance symbols:
+#   - ASX listings end in .AX      (e.g. ISLM.AX)
+#   - US listings have no suffix    (e.g. AAPL)
+#
+# halal_status values (honest labelling — the engine never "certifies" halal):
+#   compliant        -> a Hejaz Shariah-compliant ASX ETF (fund-level screened)
+#   etf_screened     -> a large cap of the type global halal equity ETFs hold;
+#                       CONFIRM the individual name in Zoya/Musaffa before buying
+#   UNVERIFIED       -> tracked for data/learning only; compliance NOT checked
+#
+# NOTE: This is a *seed* list to start your archive. It is representative of
+# what halal equity funds hold (tech / healthcare / consumer / energy heavy,
+# no conventional banks, low-debt). It is NOT a scraped live ISLM holdings
+# list. Verify any individual stock's compliance yourself before acting.
+# ============================================================================
+
+instruments:
+
+  # --- Hejaz Shariah-compliant ASX ETFs (fund-level screened) ---------------
+  - {ticker: ISLM.AX, name: "Hejaz Equities Fund Active ETF",  group: hejaz_etf, halal_status: compliant, note: "Global Shariah-compliant equities"}
+  # EXCLUDED: HJZP.AX (Hejaz Property Fund Active ETF) - correct ASX code but Yahoo has no data.
+  # Re-enable if a second price source is added:
+  # - {ticker: HJZP.AX, name: "Hejaz Property Fund Active ETF",  group: hejaz_etf, halal_status: compliant, note: "Shariah-compliant property. Correct ASX code, but Yahoo Finance has NO data for it (checked 2026-10-01) so it is skipped until another price source is added"}
+  - {ticker: HJHI.AX, name: "Hejaz High Income Active ETF",    group: hejaz_etf, halal_status: compliant, note: "Shariah-compliant income"}
+
+  # --- Global halal large caps (typical halal-ETF holdings; CONFIRM each) ----
+  - {ticker: AAPL,  name: "Apple",              group: global_halal_largecap, halal_status: etf_screened, note: "Technology"}
+  - {ticker: MSFT,  name: "Microsoft",          group: global_halal_largecap, halal_status: etf_screened, note: "Technology"}
+  - {ticker: NVDA,  name: "NVIDIA",             group: global_halal_largecap, halal_status: etf_screened, note: "Semiconductors"}
+  - {ticker: GOOGL, name: "Alphabet",           group: global_halal_largecap, halal_status: etf_screened, note: "Technology"}
+  - {ticker: META,  name: "Meta Platforms",     group: global_halal_largecap, halal_status: etf_screened, note: "Technology"}
+  - {ticker: AVGO,  name: "Broadcom",           group: global_halal_largecap, halal_status: etf_screened, note: "Semiconductors"}
+  - {ticker: LLY,   name: "Eli Lilly",          group: global_halal_largecap, halal_status: etf_screened, note: "Healthcare"}
+  - {ticker: JNJ,   name: "Johnson & Johnson",  group: global_halal_largecap, halal_status: etf_screened, note: "Healthcare"}
+  - {ticker: MRK,   name: "Merck",              group: global_halal_largecap, halal_status: etf_screened, note: "Healthcare"}
+  - {ticker: ABBV,  name: "AbbVie",             group: global_halal_largecap, halal_status: etf_screened, note: "Healthcare"}
+  - {ticker: PG,    name: "Procter & Gamble",   group: global_halal_largecap, halal_status: etf_screened, note: "Consumer staples"}
+  - {ticker: COST,  name: "Costco",             group: global_halal_largecap, halal_status: etf_screened, note: "Consumer staples"}
+  - {ticker: HD,    name: "Home Depot",         group: global_halal_largecap, halal_status: etf_screened, note: "Consumer discretionary"}
+  - {ticker: NKE,   name: "Nike",               group: global_halal_largecap, halal_status: etf_screened, note: "Consumer discretionary"}
+  - {ticker: XOM,   name: "Exxon Mobil",        group: global_halal_largecap, halal_status: etf_screened, note: "Energy"}
+  - {ticker: CVX,   name: "Chevron",            group: global_halal_largecap, halal_status: etf_screened, note: "Energy"}
+  - {ticker: ADBE,  name: "Adobe",              group: global_halal_largecap, halal_status: etf_screened, note: "Technology"}
+  - {ticker: CRM,   name: "Salesforce",         group: global_halal_largecap, halal_status: etf_screened, note: "Technology"}
+  - {ticker: QCOM,  name: "Qualcomm",           group: global_halal_largecap, halal_status: etf_screened, note: "Semiconductors"}
+  - {ticker: TXN,   name: "Texas Instruments",  group: global_halal_largecap, halal_status: etf_screened, note: "Semiconductors"}
+  - {ticker: AMD,   name: "AMD",                group: global_halal_largecap, halal_status: etf_screened, note: "Semiconductors"}
+  - {ticker: CSCO,  name: "Cisco",              group: global_halal_largecap, halal_status: etf_screened, note: "Technology"}
+
+  # --- ASX names tracked for learning (compliance UNVERIFIED — confirm!) -----
+  - {ticker: CSL.AX, name: "CSL Limited",           group: asx_watch_unverified, halal_status: UNVERIFIED, note: "Biotech - confirm in Zoya/Musaffa"}
+  - {ticker: COH.AX, name: "Cochlear",              group: asx_watch_unverified, halal_status: UNVERIFIED, note: "Medical devices - confirm"}
+  - {ticker: RMD.AX, name: "ResMed",               group: asx_watch_unverified, halal_status: UNVERIFIED, note: "Medical devices - confirm"}
+  - {ticker: PME.AX, name: "Pro Medicus",          group: asx_watch_unverified, halal_status: UNVERIFIED, note: "Health IT - confirm"}
+  - {ticker: WTC.AX, name: "WiseTech Global",      group: asx_watch_unverified, halal_status: UNVERIFIED, note: "Software - confirm"}
+  - {ticker: XRO.AX, name: "Xero",                 group: asx_watch_unverified, halal_status: UNVERIFIED, note: "Software - confirm"}
+  - {ticker: TNE.AX, name: "TechnologyOne",        group: asx_watch_unverified, halal_status: UNVERIFIED, note: "Software - confirm"}
+  - {ticker: FMG.AX, name: "Fortescue",            group: asx_watch_unverified, halal_status: UNVERIFIED, note: "Iron ore - confirm"}

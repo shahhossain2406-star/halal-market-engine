@@ -1,0 +1,26 @@
+name: daily-capture
+# 17:30 Brisbane (no DST) = 07:30 UTC, weekdays. Also runnable by hand.
+on:
+  schedule:
+    - cron: "30 7 * * 1-5"
+  workflow_dispatch:
+concurrency: { group: engine-data, cancel-in-progress: false }
+permissions: { contents: write }
+jobs:
+  capture:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    env:
+      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      HALAL_TERMINAL_API_KEY: ${{ secrets.HALAL_TERMINAL_API_KEY }}
+      GMAIL_APP_PASSWORD: ${{ secrets.GMAIL_APP_PASSWORD }}
+      PYTHONIOENCODING: utf-8
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: { python-version: "3.12", cache: pip }
+      - run: pip install -r requirements.txt
+      - run: ci/sync_data.sh restore
+      - name: Capture, reports, weekly email
+        run: python main.py collect
+      - run: ci/sync_data.sh save

@@ -1,0 +1,47 @@
+# ============================================================================
+# SETTINGS  --  factor weights and engine options (edit freely)
+# ============================================================================
+# The ranking is transparent: each company gets a 0-100 score for every factor
+# GROUP below, then the groups are combined using these weights. Because every
+# factor is stored separately, the monthly/yearly reports can later explain
+# exactly which factors drove a company's rank up or down (attribution).
+#
+# Tune the weights to your investing philosophy. For a long-term halal focus,
+# value + quality + dividends are weighted highest and momentum/crowd are
+# treated as *context*. Weights are re-appliable to history at any time, so you
+# can re-rank the past under a different philosophy to learn from it.
+# ============================================================================
+
+# --- Group weights (should sum to ~1.0; the engine normalises anyway) --------
+weights:
+  value:     0.30   # cheapness: near lows, low P/E, low P/B, high dividend yield
+  quality:   0.35   # business strength: margins, growth, low debt
+  momentum:  0.20   # trend: recent returns, above moving averages
+  crowd:     0.15   # activity: volume spikes, volatility (context, not a buy reason)
+
+# --- Which factor groups to treat as "higher = more attractive" --------------
+# (All groups are scored so that higher = more attractive to the relevant
+#  investor type. Do not change unless you know what you're doing.)
+
+# --- Engine options ----------------------------------------------------------
+options:
+  history_days: 400          # how much price history to pull per ticker (for MAs/52w)
+  min_history_for_factor: 60 # skip momentum/MA factors if fewer bars than this
+  archive_raw: true          # keep dated raw data files under data/raw/ (your references)
+  currency_note: "Prices are in each listing's native currency (AUD for .AX, USD for US)."
+
+# --- Storage backend (Phase 0 = sqlite; swap to postgres/supabase later) -----
+storage:
+  backend: sqlite            # 'sqlite' now; 'postgres' later (same interface)
+  sqlite_path: data/engine.db
+  # postgres_dsn: "postgresql://user:pass@host:5432/dbname"   # for the future
+
+# --- Weekly email (sent when the Friday weekly report is written) -----------
+# Needs a Gmail APP PASSWORD in config/secrets.local.yaml as gmail_app_password.
+# Until that exists nothing is sent (the log says "email skipped").
+email:
+  enabled: true
+  to: "shahhossain2406@gmail.com"
+  from: "shahhossain2406@gmail.com"     # the Gmail account that sends it
+  smtp_host: smtp.gmail.com
+  smtp_port: 587                        # 587 (STARTTLS); 465 is blocked by Norton mail scanning

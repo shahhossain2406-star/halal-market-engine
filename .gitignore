@@ -1,0 +1,8 @@
+config/secrets.local.yaml
+data/
+logs/
+reports/
+certs/
+__pycache__/
+*.pyc
+*.eml
