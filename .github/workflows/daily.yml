@@ -20,7 +20,7 @@ jobs:
       - uses: actions/setup-python@v5
         with: { python-version: "3.12", cache: pip }
       - run: pip install -r requirements.txt
-      - run: ci/sync_data.sh restore
+      - run: bash ci/sync_data.sh restore
       - name: Capture, reports, weekly email
         run: python main.py collect
-      - run: ci/sync_data.sh save
+      - run: bash ci/sync_data.sh save
