@@ -14,6 +14,7 @@ jobs:
       GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       HALAL_TERMINAL_API_KEY: ${{ secrets.HALAL_TERMINAL_API_KEY }}
       PYTHONIOENCODING: utf-8
+      TZ: Australia/Brisbane
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
