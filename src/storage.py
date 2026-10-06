@@ -86,6 +86,23 @@ CREATE TABLE IF NOT EXISTS capture_source (
     source TEXT NOT NULL
 );
 
+-- paper trading: one shared virtual portfolio, gains/losses split equally
+CREATE TABLE IF NOT EXISTS paper_meta (
+    key   TEXT PRIMARY KEY,
+    value TEXT
+);
+
+CREATE TABLE IF NOT EXISTS paper_trades (
+    id     INTEGER PRIMARY KEY AUTOINCREMENT,
+    date   TEXT NOT NULL,
+    ticker TEXT NOT NULL,
+    side   TEXT NOT NULL,          -- buy | sell
+    qty    REAL NOT NULL,
+    price  REAL NOT NULL,
+    fee    REAL NOT NULL DEFAULT 0,
+    note   TEXT                    -- why the group decided this
+);
+
 CREATE INDEX IF NOT EXISTS idx_metrics_ticker ON metrics(ticker, metric);
 CREATE INDEX IF NOT EXISTS idx_scores_ticker  ON factor_scores(ticker, factor);
 CREATE INDEX IF NOT EXISTS idx_ranks_date      ON ranks(date);
@@ -284,6 +301,39 @@ class Storage:
                      path=excluded.path, fetched_at=excluded.fetched_at""",
                 (date, ticker, source, path, fetched_at),
             )
+
+    # ---- paper trading ------------------------------------------------------
+    def paper_get(self, key: str, default=None):
+        with self._conn() as con:
+            r = con.execute("SELECT value FROM paper_meta WHERE key=?", (key,)).fetchone()
+            return r[0] if r else default
+
+    def paper_set(self, key: str, value):
+        with self._conn() as con:
+            con.execute(
+                "INSERT INTO paper_meta(key,value) VALUES(?,?) "
+                "ON CONFLICT(key) DO UPDATE SET value=excluded.value", (key, str(value)))
+
+    def paper_add_trade(self, date, ticker, side, qty, price, fee=0.0, note=""):
+        with self._conn() as con:
+            con.execute(
+                "INSERT INTO paper_trades(date,ticker,side,qty,price,fee,note) "
+                "VALUES(?,?,?,?,?,?,?)", (date, ticker, side, qty, price, fee, note))
+
+    def paper_trades(self) -> list[dict]:
+        with self._conn() as con:
+            cur = con.execute(
+                "SELECT id,date,ticker,side,qty,price,fee,note FROM paper_trades "
+                "ORDER BY date, id")
+            return [dict(id=a, date=b, ticker=c, side=d, qty=e, price=f, fee=g, note=h)
+                    for (a, b, c, d, e, f, g, h) in cur.fetchall()]
+
+    def close_on_or_before(self, ticker: str, date: str):
+        """(date, close) of the newest stored close on/before `date`, or None."""
+        with self._conn() as con:
+            return con.execute(
+                "SELECT date,value FROM metrics WHERE ticker=? AND metric='close' "
+                "AND date<=? ORDER BY date DESC LIMIT 1", (ticker, date)).fetchone()
 
     # ---- reads used by reports ---------------------------------------------
     def latest_date(self) -> str | None:

@@ -166,6 +166,23 @@ full) carry the graphical ranking. PDFs open cleanly on a phone.
 
 Until the password exists the log (`logs/collect.log`) says "email skipped" and nothing is sent.
 
+## Paper-trading portfolio (pretend money)
+
+A shared virtual portfolio for practising as a group. No real money moves; gains and
+losses are shared equally among the members.
+
+```bash
+python main.py paper init --cash 100000 --members 10
+python main.py paper buy WTC.AX 100 --note "why the group decided this"
+python main.py paper sell WTC.AX 20 --note "why"
+python main.py paper status
+python main.py paper report        # writes reports/paper_<date>.html
+```
+
+Rules: every trade needs a `--note`; buys require a screening result of pass/fund
+(`--force` overrides and is logged); no margin and no shorting. No fees, tax or
+currency conversion are modelled. Not financial advice.
+
 ## Backups
 Each daily run saves a compressed, verified copy of `data/engine.db` to `data/backups/`
 (newest 14 + the last copy of each of the past 12 months). Restore: gunzip a file and

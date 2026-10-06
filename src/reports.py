@@ -456,13 +456,14 @@ def halal_view(store, include_review=False):
 
 # --------------------------------------------------------------------------- #
 _KINDS = [("daily", "Daily"), ("weekly", "Weekly"), ("monthly", "Monthly"),
-          ("quarterly", "Quarterly"), ("half_year", "Half-year"), ("yearly", "Yearly")]
+          ("quarterly", "Quarterly"), ("half_year", "Half-year"), ("yearly", "Yearly"),
+          ("paper", "Paper portfolio")]
 
 
 def index_page(out_dir):
     """reports/index.html - a phone-friendly list of every report, newest first."""
     import re
-    pat = re.compile(r"^(daily|weekly|monthly|quarterly|half_year|yearly)"
+    pat = re.compile(r"^(daily|weekly|monthly|quarterly|half_year|yearly|paper)"
                      r"(_halal_plus|_halal)?_(\d{4}-\d{2}-\d{2})\.html$")
     found = {}                       # kind -> date -> {"halal": f, "full": f, "plus": f}
     for f in os.listdir(out_dir):

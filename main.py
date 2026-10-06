@@ -359,9 +359,60 @@ def cmd_report(args):
     reports_mod.index_page(out)
 
 
+def cmd_paper(args):
+    import datetime as dt
+    import paper as paper_mod
+    store, cfg = _store()
+    out = os.path.join(ROOT, "reports")
+    try:
+        if args.action == "init":
+            paper_mod.init(store, args.cash, args.members,
+                           dt.date.today().isoformat())
+            print(f"  paper portfolio created: {args.cash:,.2f} shared by "
+                  f"{args.members} members ({args.cash / args.members:,.2f} each)")
+        elif args.action in ("buy", "sell"):
+            date = args.date or store.latest_date() or dt.date.today().isoformat()
+            px = paper_mod.trade(store, args.action, args.ticker, args.qty, date,
+                                 price=args.price, fee=args.fee, note=args.note or "",
+                                 force=args.force)
+            print(f"  recorded: {args.action} {args.qty:g} {args.ticker.upper()} "
+                  f"@ {px:,.2f} on {date}")
+        elif args.action == "status":
+            date = store.latest_date()
+            if not date:
+                raise ValueError("no market data yet. Run 'collect' first.")
+            v = paper_mod.valuation(store, date)
+            print(f"  as of {date}: value {v['nav']:,.2f} ({v['ret_pct']:+.2f}%), "
+                  f"cash {v['cash']:,.2f}")
+            for r in v["positions"]:
+                print(f"    {r['ticker']:8} {r['qty']:g} @ {r['avg_cost']:,.2f} "
+                      f"-> {r['price']:,.2f}  P/L {r['pnl']:+,.2f}")
+            print(f"  each of {v['members']} members: {v['share_value']:,.2f} "
+                  f"({v['share_pnl']:+,.2f})")
+        elif args.action == "report":
+            p = paper_mod.paper_report(store, out)
+            reports_mod.index_page(out)
+            print(f"  report: {p}")
+    except ValueError as e:
+        raise SystemExit(f"  ! {e}")
+
+
 def main():
     ap = argparse.ArgumentParser(description="Halal Market Analysis Engine (Phase 0)")
     sub = ap.add_subparsers(dest="cmd", required=True)
+
+    pp = sub.add_parser("paper", help="shared paper-trading (pretend-money) portfolio")
+    pp.add_argument("action", choices=["init", "buy", "sell", "status", "report"])
+    pp.add_argument("ticker", nargs="?", help="buy/sell: ticker, e.g. AAPL or WTC.AX")
+    pp.add_argument("qty", nargs="?", type=float, help="buy/sell: number of shares")
+    pp.add_argument("--cash", type=float, default=100000, help="init: total starting cash")
+    pp.add_argument("--members", type=int, default=10, help="init: number of members")
+    pp.add_argument("--price", type=float, help="default: latest stored close")
+    pp.add_argument("--date", help="YYYY-MM-DD (default: latest data date)")
+    pp.add_argument("--fee", type=float, default=0.0)
+    pp.add_argument("--note", help="REQUIRED for trades: why the group decided this")
+    pp.add_argument("--force", action="store_true",
+                    help="allow a buy that is not screen-pass (recorded in the log)")
 
     sub.add_parser("collect", help="capture today's data (real, via yfinance)")
 
@@ -411,6 +462,10 @@ def main():
         cmd_demo(args)
     elif args.cmd == "report":
         cmd_report(args)
+    elif args.cmd == "paper":
+        if args.action in ("buy", "sell") and (not args.ticker or not args.qty):
+            ap.error("paper buy/sell needs TICKER and QTY, e.g. paper buy AAPL 10 --note \"why\"")
+        cmd_paper(args)
 
 
 if __name__ == "__main__":
